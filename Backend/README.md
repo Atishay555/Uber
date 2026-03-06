@@ -1,4 +1,5 @@
-# Users API — Register Endpoint
+# BACKEND API — DOCUMENTATION
+## Users API — Register Endpoint
 
 ## POST /users/register
 
