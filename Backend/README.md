@@ -133,3 +133,76 @@ curl -X POST http://localhost:3000/users/login \
 Notes
 
 - Successful responses include a JWT token; the returned `user` object does not include the password field.
+
+## GET /users/profile
+
+Description
+
+- Returns the authenticated user's profile information.
+
+Request
+
+- Method: `GET`
+- URL: `/users/profile`
+- Headers: `Authorization: Bearer <token>` (required)
+
+Responses
+
+- `200 OK` — request successful.
+  - Body: `{ "user": { ... } }` (user object does not include the password field)
+
+- `401 Unauthorized` — missing or invalid token. Example body:
+
+```json
+{ "message": "Authentication required" }
+```
+
+- `500 Internal Server Error` — unexpected server error.
+
+Examples
+
+- Curl
+
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:3000/users/profile
+```
+
+Notes
+
+- This endpoint requires a valid JWT sent in the `Authorization` header using the `Bearer` scheme.
+
+## GET /users/logout
+
+Description
+
+- Logs the user out by invalidating the current session/token on the server (implementation-specific) and returns a confirmation message.
+
+Request
+
+- Method: `GET`
+- URL: `/users/logout`
+- Headers: `Authorization: Bearer <token>` (required)
+
+Responses
+
+- `200 OK` — logout successful. Example body:
+
+```json
+{ "message": "Logged out successfully" }
+```
+
+- `401 Unauthorized` — missing or invalid token.
+
+- `500 Internal Server Error` — unexpected server error.
+
+Examples
+
+- Curl
+
+```bash
+curl -X GET -H "Authorization: Bearer <token>" http://localhost:3000/users/logout
+```
+
+Notes
+
+- Exact logout behavior depends on server implementation (e.g., token blacklist, session removal). The client should delete its stored token after a successful logout.
