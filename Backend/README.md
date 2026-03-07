@@ -249,6 +249,145 @@ Notes
 - The endpoint expects `vehicle` object containing plate, color, capacity and vehicleType.
 - On success the server responds with a JWT token and the created `captain` object (password is omitted).
 
+## POST /captains/login
+
+Description
+
+- Authenticates a captain and returns an auth token and the captain object.
+
+Request
+
+- Method: `POST`
+- URL: `/captains/login`
+- Content-Type: `application/json`
+
+Body (JSON)
+
+{
+"email": "jane.smith@example.com",
+"password": "securepassword"
+}
+
+Field details
+
+- `email` (string) — required, must be a valid email address.
+- `password` (string) — required, minimum 6 characters.
+
+Responses
+
+- `200 OK` — login successful.
+  - Body: `{ "token": "<jwt>", "captain": { ... } }`
+
+- `400 Bad Request` — validation failed. Example body:
+
+```json
+{
+  "errors": [
+    { "msg": "Invalid Email", "param": "email", "location": "body" },
+    {
+      "msg": "password should atleast 6 character long",
+      "param": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+- `401 Unauthorized` — invalid credentials. Example body:
+
+```json
+{ "message": "Invalid Email or Password" }
+```
+
+- `500 Internal Server Error` — unexpected server error.
+
+Examples
+
+- Curl
+
+```bash
+curl -X POST http://localhost:3000/captains/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"jane.smith@example.com","password":"securepassword"}'
+```
+
+Notes
+
+- Successful responses include a JWT token; the returned `captain` object does not include the password field.
+
+## GET /captains/profile
+
+Description
+
+- Returns the authenticated captain's profile information.
+
+Request
+
+- Method: `GET`
+- URL: `/captains/profile`
+- Headers: `Authorization: Bearer <token>` (required)
+
+Responses
+
+- `200 OK` — request successful.
+  - Body: `{ ... }` (captain object does not include the password field)
+
+- `401 Unauthorized` — missing or invalid token. Example body:
+
+```json
+{ "message": "Unauthorized" }
+```
+
+- `500 Internal Server Error` — unexpected server error.
+
+Examples
+
+- Curl
+
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:3000/captains/profile
+```
+
+Notes
+
+- This endpoint requires a valid JWT sent in the `Authorization` header using the `Bearer` scheme.
+
+## GET /captains/logout
+
+Description
+
+- Logs the captain out by invalidating the current session/token on the server and returns a confirmation message.
+
+Request
+
+- Method: `GET`
+- URL: `/captains/logout`
+- Headers: `Authorization: Bearer <token>` (required)
+
+Responses
+
+- `200 OK` — logout successful. Example body:
+
+```json
+{ "message": "logout" }
+```
+
+- `401 Unauthorized` — missing or invalid token.
+
+- `500 Internal Server Error` — unexpected server error.
+
+Examples
+
+- Curl
+
+```bash
+curl -X GET -H "Authorization: Bearer <token>" http://localhost:3000/captains/logout
+```
+
+Notes
+
+- The token is blacklisted on the server; the client should delete its stored token after a successful logout.
+
 ## GET /users/logout
 
 Description
