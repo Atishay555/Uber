@@ -171,6 +171,84 @@ Notes
 
 - This endpoint requires a valid JWT sent in the `Authorization` header using the `Bearer` scheme.
 
+## POST /captains/register
+
+Description
+
+- Registers a new captain (driver) and returns an auth token and captain object.
+
+Request
+
+- Method: `POST`
+- URL: `/captains/register`
+- Content-Type: `application/json`
+
+Body (JSON)
+
+{
+"fullname": {
+"firstname": "Jane",
+"lastname": "Smith"
+},
+"email": "jane.smith@example.com",
+"password": "securepassword",
+"vehicle": {
+"plate": "ABC123",
+"color": "red",
+"capacity": 4,
+"vehicleType": "car"
+}
+}
+
+Field details
+
+- `fullname.firstname` (string) — required, minimum 3 characters.
+- `fullname.lastname` (string) — optional, minimum 3 characters when provided.
+- `email` (string) — required, must be a valid email address.
+- `password` (string) — required, minimum 6 characters.
+- `vehicle.plate` (string) — required, minimum 3 characters.
+- `vehicle.color` (string) — required, minimum 3 characters.
+- `vehicle.capacity` (number) — required, minimum 1.
+- `vehicle.vehicleType` (string) — required, one of `car`, `auto`, `bike`.
+
+Responses
+
+- `201 Created` — registration successful.
+  - Body: `{ "token": "<jwt>", "captain": { ... } }`
+  - Note: The returned `captain` object does not include the password field.
+
+- `400 Bad Request` — validation failed. Example body:
+
+```json
+{
+  "errors": [
+    { "msg": "Invalid Email", "param": "email", "location": "body" },
+    {
+      "msg": "vehicle.vehicleType must be one of car,auto,bike",
+      "param": "vehicle.vehicleType",
+      "location": "body"
+    }
+  ]
+}
+```
+
+- `500 Internal Server Error` — unexpected server error.
+
+Examples
+
+- Curl
+
+```bash
+curl -X POST http://localhost:3000/captains/register \
+  -H "Content-Type: application/json" \
+  -d '{"fullname":{"firstname":"Jane","lastname":"Smith"},"email":"jane.smith@example.com","password":"securepassword","vehicle":{"plate":"ABC123","color":"red","capacity":4,"vehicleType":"car"}}'
+```
+
+Notes
+
+- The endpoint expects `vehicle` object containing plate, color, capacity and vehicleType.
+- On success the server responds with a JWT token and the created `captain` object (password is omitted).
+
 ## GET /users/logout
 
 Description
